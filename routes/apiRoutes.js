@@ -11,14 +11,13 @@ module.exports = function (app) {
 
         //read json file
         notesArray = JSON.parse(fs.readFileSync("./db/db.json"));
-        console.log( notesArray);
-        //display notes in json format
+
+        //display notes
         res.json(notesArray);
 
     });
 
-
-// post new note to API route (and generate unique ID for note)
+// post new note to API route
 
     app.post("/api/notes", (req, res) => {
         // read the file with all of the existing notes
@@ -26,7 +25,6 @@ module.exports = function (app) {
 
         //save note id
         let noteId = notesArray.length + 1;
-        // notesArray.push(notesData);
 
         // add new note to notes array with a generated ID
         notesArray.push({
@@ -42,22 +40,23 @@ module.exports = function (app) {
     });
 
 
-// go to notes id
-    app.delete("/api/notes:id", (req, res) =>{
-
-        //save note's id
-
+// // go to notes id
+    app.delete("/api/notes/:id", (req, res) => {
 
         //read file with existing notes
         notesArray = JSON.parse(fs.readFileSync("./db/db.json"));
-        //const noteId = parseInt(req.params.id);
+
+        //save note's id
+        const noteId = req.params.id;
 
 
         //remove note from db
-         notesArray = notesArray.filter(element => {
-             return element.id !== req.params.id
-         });
-        //console.log("This is the chosen note id : " + req.params.id);
+        notesArray.forEach((element, index) => {
+            if (parseInt(element.id) === parseInt(noteId)) {
+                //modify db from the beginning(index 0) and remove 1 item
+                notesArray.splice(index, 1);
+            }
+        });
 
         //write to file
         fs.writeFileSync("./db/db.json", JSON.stringify(notesArray));
@@ -65,3 +64,4 @@ module.exports = function (app) {
     });
 
 }
+
